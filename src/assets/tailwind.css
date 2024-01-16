@@ -1,0 +1,11 @@
+/* src/assets/style.css */
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer base{
+    /* body {
+        background-color: rgb(186,73,73);
+    } */
+}
