@@ -1,5 +1,5 @@
 <script setup>
-import { inject, ref, defineProps, provide, watch, watchEffect } from "vue";
+import { inject, ref, defineProps, provide, watchEffect } from "vue";
 import ChangeColor from "@/components/Modal/ChangeColorModal.vue";
 
 const theme = inject("theme");
@@ -15,11 +15,11 @@ const colors = ref([
   { name: "grass", color: "rgb(81,138,88)", chosed: false },
   { name: "grayColor", color: "rgb(84,87,100)", chosed: false },
 ]);
-const colorBlock = ref([
-  { color: theme.themeforView.value.pomodoro.bg, id: 0 },
-  { color: theme.themeforView.value.short.bg, id: 1 },
-  { color: theme.themeforView.value.long.bg, id: 2 },
-]);
+const colorBlock = [
+  { color: "", id: 0 },
+  { color: "", id: 1 },
+  { color: "", id: 2 },
+];
 
 provide("colors", { colors, colorModal });
 
@@ -161,11 +161,18 @@ watchEffect(() => {
           <div>
             <button
               @click="() => changeColor(color.id)"
-              v-for="color in colorBlock"
+              v-for="(color, index) in colorBlock"
               :key="color.color"
               class="w-7 h-7 rounded-md"
               :class="{ 'mr-3': color.id !== 2 }"
-              :style="{ backgroundColor: color.color }"
+              :style="{
+                backgroundColor:
+                  index == 0
+                    ? theme.themeforView.value.pomodoro.bg
+                    : index == 1
+                      ? theme.themeforView.value.short.bg
+                      : theme.themeforView.value.long.bg,
+              }"
             ></button>
           </div>
         </div>

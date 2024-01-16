@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onUnmounted, computed, inject, watch, watchEffect } from "vue";
 import InputForm from "@/components/Form.vue";
-import Modal from "@/components/Modal/index.vue";
+import Modal from "@/components/Modal/SettingModal.vue";
 import cloneDeep from "lodash/cloneDeep";
 
 const newTask = ref(false);
@@ -99,12 +99,16 @@ const toolsBtns = [
 
 const curTaskNum = computed(() => {
   const index = tasks.value.findIndex((item) => item.isPoint === true);
-  return tasks.value[index].id + 1;
+  if (tasks.value[index]) {
+    return tasks.value[index].id + 1;
+  }
 });
 
 const curTaskName = computed(() => {
   const index = tasks.value.findIndex((item) => item.isPoint === true);
-  return tasks.value[index].title;
+  if (tasks.value[index]) {
+    return tasks.value[index].title;
+  }
 });
 
 const leftPomo = computed(() => {
@@ -132,7 +136,13 @@ watch(theme.per, (newValue, oldValue) => {
 
 function addNewTask(condition) {
   const allFixClose = tasks.value.every((item) => !item.taskFix);
-  if (condition == true && !allFixClose) {
+  if (!allFixClose) {
+    showConfirmText();
+  }
+  if (condition == true) {
+    tasks.value = tasks.value.map((item) => {
+      return { ...item, taskFix: false, taskList: true };
+    });
     newTask.value = true;
   } else {
     newTask.value = false;
@@ -228,11 +238,12 @@ function newTaskSubmitted() {
   };
   nextId.value += 1;
   tasks.value.push(newItem);
+  formdata.value = { pomoNum: 1, title: "", note: "" };
 }
 
 //修改任務
 function fixSubmit(index) {
-  tasks.value[index] = fixFormdata.value[index];
+  tasks.value = fixFormdata.value;
   tasks.value[index].taskList = true;
   tasks.value[index].taskFix = false;
 }
@@ -599,7 +610,7 @@ function handlePoint(id) {
                 </div>
                 <button
                   class="border rounded p-1"
-                  @click="() => openFix(index)"
+                  @click="() => openFix(task.id)"
                 >
                   <img
                     class="w-[18px] h-[18px]"
@@ -619,15 +630,15 @@ function handlePoint(id) {
           <InputForm
             v-if="task.taskFix"
             class="mb-2"
-            v-model:title="fixFormdata[index].title"
-            v-model:pomo="fixFormdata[index].allTask"
-            v-model:note="fixFormdata[index].note"
+            v-model:title="fixFormdata[task.id].title"
+            v-model:pomo="fixFormdata[task.id].allTask"
+            v-model:note="fixFormdata[task.id].note"
             :showNote="showNote"
             :visibleNote="task.note != '' || fixNote"
-            :plus="() => fixPlus(index)"
-            :minus="() => fixMinus(index)"
-            :submit="() => fixSubmit(index)"
-            :addnewTask="() => closeFix(index)"
+            :plus="() => fixPlus(task.id)"
+            :minus="() => fixMinus(task.id)"
+            :submit="() => fixSubmit(task.id)"
+            :addnewTask="() => closeFix(task.id)"
             ><template v-slot:delete
               ><button @click="() => deleteTask(task.id)">
                 Delete
@@ -637,7 +648,7 @@ function handlePoint(id) {
             <template v-slot:finishedNum
               ><input
                 class="bg-formGray mr-2.5 p-2.5 font-bold w-[75px] rounded"
-                v-model="fixFormdata[index].finished"
+                v-model="fixFormdata[task.id].finished"
               />/
             </template>
           </InputForm>
