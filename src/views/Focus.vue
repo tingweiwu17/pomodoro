@@ -134,6 +134,7 @@ watch(theme.per, (newValue, oldValue) => {
   second.value = 0;
 });
 
+//新增任務
 function addNewTask(condition) {
   const allFixClose = tasks.value.every((item) => !item.taskFix);
   if (!allFixClose) {
@@ -173,7 +174,7 @@ watchEffect(() => {
   timeLine.value =
     ((theme.theme.value.mins * 60 - (minute.value * 60 + second.value)) /
       (theme.theme.value.mins * 60)) *
-    620;
+    100;
 
   const newTask = tasks.value.filter((item) => item.isChecked === false);
 
@@ -258,6 +259,7 @@ function counting() {
   intervelId = setInterval(() => {
     if (theme.start.value && (minute.value > 0 || second.value > 0)) {
       if (second.value > 0) {
+        console.log("test");
         second.value -= 1;
       } else if (minute.value > 0) {
         minute.value -= 1;
@@ -282,7 +284,13 @@ watchEffect(() => {
     const id = tasks.value.findIndex((item) => item.isPoint === true);
     theme.toNextPeriod();
     if (theme.per.value === 1) {
-      tasks.value = tasks.value[id].finished += 1;
+      tasks.value = tasks.value.map((item, index) => {
+        if (index == id) {
+          return { ...item, finished: item.finished + 1 };
+        } else {
+          return { ...item };
+        }
+      });
       theme.toggleBtn(1);
       if (theme.isSwitch[1] === false) {
         theme.start.value = false;
@@ -362,23 +370,27 @@ function openFix(id) {
   if (!allFixClose) {
     showConfirmText();
   }
-  for (let i = 0; i < tasks.value.length; i++) {
-    if (id === i) {
-      tasks.value[i].taskFix = true;
-      tasks.value[i].taskList = false;
+  tasks.value = tasks.value.map((item) => {
+    if (item.id == id) {
+      return { ...item, taskFix: true, taskList: false };
     } else {
-      tasks.value[i].taskFix = false;
-      tasks.value[i].taskList = true;
+      return { ...item, taskFix: false, taskList: true };
     }
-  }
+  });
 }
 
 function closeFix(id) {
-  if (10 == 5) {
+  if (
+    fixFormdata.value[id].title !== tasks.value[id].title ||
+    fixFormdata.value[id].note !== tasks.value[id].note ||
+    fixFormdata.value[id].allTask !== tasks.value[id].allTask ||
+    fixFormdata.value[id].finished !== tasks.value[id].finished
+  ) {
     showConfirmText();
   }
-  tasks.value[id].taskFix = false;
-  tasks.value[id].taskList = true;
+  tasks.value = tasks.value.map((item) => {
+    return { ...item, taskFix: false, taskList: true };
+  });
 }
 
 function showNoteInput() {
@@ -450,7 +462,7 @@ function handlePoint(id) {
       </div>
       <Modal v-if="openSetting" :closeModal="() => toSetting(false)"></Modal>
     </div>
-    <p class="bg-white h-[3px]" :style="{ width: timeLine + 'px' }"></p>
+    <p class="bg-white h-[3px]" :style="{ width: timeLine + '%' }"></p>
     <div class="w-contentW all-view m-auto relative">
       <div
         class="bg-bgGray gray-area rounded-md pt-5 pb-[30px] mb-5 mt-10"
