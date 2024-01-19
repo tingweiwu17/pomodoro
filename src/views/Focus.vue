@@ -438,8 +438,6 @@ function handlePoint(id) {
 </script>
 
 <template>
-  {{ tasks }}<br />
-  {{ fixFormdata }}
   <div class="m-auto max-w-[620px] all-view px-3">
     <div
       class="header flex justify-between shadow items-center h-[60px] border-black"
