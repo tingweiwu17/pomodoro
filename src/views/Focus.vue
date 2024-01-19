@@ -54,6 +54,10 @@ const tasks = ref([
   },
 ]);
 const fixFormdata = ref(cloneDeep(tasks.value));
+watch(tasks, (newVal) => {
+  fixFormdata.value = cloneDeep(newVal);
+});
+
 const tasksRef = ref(tasks.value);
 const menuButtons = [
   { icon: "src/assets/picture/graph-white.png", text: "Report", click: "" },
@@ -118,7 +122,7 @@ const leftPomo = computed(() => {
 
 const nowSchedule = computed(() => {
   const left = tasks.value.filter((item) => item.isChecked === false);
-  return left.reduce((acc, curr) => acc + curr.finished, 0);
+  return left.reduce((acc, curr) => parseInt(acc) + parseInt(curr.finished), 0);
 });
 
 const fixMin = computed(() => {
@@ -146,7 +150,9 @@ function addNewTask(condition) {
     });
     newTask.value = true;
   } else {
+    formdata.value = { pomoNum: 1, title: "", note: "" };
     newTask.value = false;
+    isVisibleAddNote.value = false;
   }
 }
 
@@ -240,6 +246,7 @@ function newTaskSubmitted() {
   nextId.value += 1;
   tasks.value.push(newItem);
   formdata.value = { pomoNum: 1, title: "", note: "" };
+  newTask.value = false;
 }
 
 //修改任務
@@ -388,6 +395,7 @@ function closeFix(id) {
   ) {
     showConfirmText();
   }
+  fixNote.value = false;
   tasks.value = tasks.value.map((item) => {
     return { ...item, taskFix: false, taskList: true };
   });
@@ -430,6 +438,8 @@ function handlePoint(id) {
 </script>
 
 <template>
+  {{ tasks }}<br />
+  {{ fixFormdata }}
   <div class="m-auto max-w-[620px] all-view px-3">
     <div
       class="header flex justify-between shadow items-center h-[60px] border-black"
@@ -449,6 +459,7 @@ function handlePoint(id) {
           alt="A check icon"
         /><span class="title">Pomofocus</span>
       </h1>
+
       <div class="flex relative">
         <button
           v-for="item in menuButtons"

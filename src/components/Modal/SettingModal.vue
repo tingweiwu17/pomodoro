@@ -214,7 +214,7 @@ watchEffect(() => {
           class="bg-black ok text-white text-sm rounded min-w-[70px] border-2 border-black py-2 px-3"
           @click="closeModal"
         >
-          OK
+          Close
         </button>
       </div>
     </div>
