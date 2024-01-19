@@ -3,6 +3,7 @@ import { ref, onUnmounted, computed, inject, watch, watchEffect } from "vue";
 import InputForm from "@/components/Form.vue";
 import Modal from "@/components/Modal/SettingModal.vue";
 import cloneDeep from "lodash/cloneDeep";
+import DoneAll from "@/components/Object/FinishedAll.vue";
 
 const newTask = ref(false);
 const second = ref(0);
@@ -101,6 +102,10 @@ const toolsBtns = [
   },
 ];
 
+const finishedAll = computed(() => {
+  return exitTask.value === true && leftPomo.value === nowSchedule.value;
+});
+
 const curTaskNum = computed(() => {
   const index = tasks.value.findIndex((item) => item.isPoint === true);
   if (tasks.value[index]) {
@@ -123,6 +128,10 @@ const leftPomo = computed(() => {
 const nowSchedule = computed(() => {
   const left = tasks.value.filter((item) => item.isChecked === false);
   return left.reduce((acc, curr) => parseInt(acc) + parseInt(curr.finished), 0);
+});
+
+const exitTask = computed(() => {
+  return tasks.value.length !== 0;
 });
 
 const fixMin = computed(() => {
@@ -697,6 +706,7 @@ function handlePoint(id) {
           ><template v-slot:delete><div></div></template
         ></InputForm>
         <div
+          v-if="exitTask"
           class="bg-checked finished mt-7 py-[18px] px-3 flex justify-center text-white border-t-[1px]"
         >
           <div class="mx-2 text-timeColor">
@@ -718,6 +728,7 @@ function handlePoint(id) {
         </div>
       </div>
     </div>
+    <DoneAll v-if="finishedAll" />
   </div>
 </template>
 
