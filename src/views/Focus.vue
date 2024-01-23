@@ -55,9 +55,13 @@ const tasks = ref([
   },
 ]);
 const fixFormdata = ref(cloneDeep(tasks.value));
-watch(tasks, (newVal) => {
-  fixFormdata.value = cloneDeep(newVal);
-});
+watch(
+  tasks,
+  (newVal) => {
+    fixFormdata.value = cloneDeep(newVal);
+  },
+  { deep: true }
+);
 
 const tasksRef = ref(tasks.value);
 const menuButtons = [
@@ -267,7 +271,14 @@ function fixSubmit(index) {
 
 //刪除任務
 function deleteTask(index) {
-  tasks.value.splice(index, 1);
+  const indexToDelete = tasks.value.findIndex((item) => item.id === index);
+
+  if (indexToDelete !== -1) {
+    tasks.value.splice(indexToDelete, 1);
+    tasks.value.forEach((task, i) => {
+      task.id = i;
+    });
+  }
 }
 
 function counting() {
@@ -728,7 +739,7 @@ function handlePoint(id) {
         </div>
       </div>
     </div>
-    <DoneAll v-if="finishedAll" />
+    <DoneAll :clear="() => clearAll()" v-if="finishedAll" />
   </div>
 </template>
 

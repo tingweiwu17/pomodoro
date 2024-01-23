@@ -6,13 +6,16 @@
       You've finished all your tasks for today<span>🎉</span>
     </p>
     <button
+      @click="clear"
       class="bg-finished text-white border-2 border-finished py-2 px-4 rounded opacity-90 text-sm"
     >
       Clear Tasks
     </button>
   </div>
 </template>
-<script setup></script>
+<script setup>
+const props = defineProps({ clear: Function });
+</script>
 <style scoped>
 .finished {
   left: calc(50% - 248px);
